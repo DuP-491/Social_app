@@ -73,11 +73,28 @@
 		<div id="recentPosts" class="col s12">
 			<!-- <h3 class="active indigo-text text-darken-4">Recent Posts</h3> -->
 			<br>
-			{% for post in posts %}
+			{% for post in page_obj %}
 
 			{% include 'snippets/postCardHome.html' %}
 
 			{% endfor %}
+			<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
 		</div>
 		<div id="searchPosts" class="col s12">
 			<!-- <h2 class="active indigo-text text-darken-4">Search Posts</h2> -->
@@ -92,8 +109,6 @@
 			{% endfor %}
 
 		</div>
-
-
 
 	</div>
 	<div class="col s12 m3 l2 ">

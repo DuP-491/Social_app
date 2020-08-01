@@ -16,6 +16,7 @@ from .forms import PollForm,PollChoiceFormset,PostCreateFrom,GroupPostCreateForm
 from Group.models import Group,Channel
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 
 
 # class PostListView(ListView):
@@ -36,15 +37,22 @@ official_tag=['official','avishkar','freshers']
 def PostListView(request):
     if request.user.is_authenticated:
         posts = Post.objects.filter(grouppost__isnull=True).order_by('-date_posted')
-    # .annotate(like_count=Count('likers')).order_by('-like_count')
+
+        paginator= Paginator(posts,10)
+        page_number = request.GET.get('page')
+        page_obj=paginator.get_page(page_number)
+
         tags = Tag.objects.all
         groups = Group.objects.all
+
         form1 = SearchForm(request.POST)
+
         context = {
         'posts' : posts,
         'groups' : groups,
         'tags' : tags,
         'form' : form1,
+        'page_obj':page_obj,
         }
         if request.user.is_authenticated:
             aposts = posts.filter(tags__name__in=official_tag).filter(tags__in=request.user.profile.tags.all()).distinct()
