@@ -18,6 +18,7 @@ from Tag.models import Tag
 from .models import Group, GroupMember, Channel
 from Post.models import GroupPost
 from .forms import ChannelCreateForm,GroupUpdateForm,GroupCreateForm
+from django.core.paginator import Paginator
 
 #class to create group
 class CreateGroup(LoginRequiredMixin, CreateView):
@@ -60,12 +61,18 @@ def SingleGroup(request, slug, activechannel):
         gform = GroupUpdateForm(request.POST, request.FILES, instance = group)#form for updating group details
         if gform.is_valid():
             gform.save()
-    context['posts'] = GroupPost.objects.filter(parentchannel = achannel)
+    # context['posts']
+    posts = GroupPost.objects.filter(parentchannel = achannel)
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    posts = paginator.get_page(page_number)
+    context['posts']=posts
     return render(request, 'Group/group_detail.html', context)
 
 #view to show list of groups
 class ListGroups(LoginRequiredMixin,ListView):
     model = Group
+    paginate_by = 12
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context

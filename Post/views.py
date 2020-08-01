@@ -46,7 +46,6 @@ def PostListView(request):
         groups = Group.objects.all
 
         form1 = SearchForm(request.POST)
-
         context = {
         'posts' : posts,
         'groups' : groups,
@@ -56,6 +55,8 @@ def PostListView(request):
         }
         if request.user.is_authenticated:
             aposts = posts.filter(tags__name__in=official_tag).filter(tags__in=request.user.profile.tags.all()).distinct()
+            paginator = Paginator(aposts,10)
+            aposts = paginator.get_page(request.GET.get('page'))
             context['aposts'] = aposts
         return render(request, 'Post/home.html', context)
     else:
